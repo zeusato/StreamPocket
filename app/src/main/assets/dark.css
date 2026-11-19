@@ -1,0 +1,12 @@
+#diagnosticText{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:12px 0}
+:root{color-scheme:dark;--green:#8ad9b7;--muted:#a4b9ad;--line:#30483b;color:#e6eee8;background:#101814}
+header{background:#121e18}.brand{color:#e6eee8}.icon{background:transparent}button,input:not([type=checkbox]){background:#1b2a22;color:#e0eee5}button{border-color:var(--line)}
+.sources{background:#18271f}.sources button{color:#aac0b2}.sources .active{background:#315040;color:#f0fff5}
+.chips .active,.primary{background:#8ad9b7;color:#10261b;border-color:#8ad9b7}.poster{background:#203a2c;color:#a7c9b6}
+.episode,.job,.tool-card{background:#16241c}.bottom{background:#111e17}.bottom button{color:#9aafa1}.bottom .active{background:#264534;color:#bcf2d4}
+.tip{background:#1a2d21;color:#b3c8b8}.tool-symbol{color:#8ad9b7}.back{background:transparent}.eyebrow{color:#8ad9b7}
+dialog{background:#17251d}dialog::backdrop{background:#000a}.dialog-head button{background:transparent}
+#selectionBar{background:#31513e;color:#effff4}#selectionBar button{background:#a4e1bc;color:#142b1e}#notice{color:#f0c998}
+.pick input{border-color:#709782}.pick input:checked{background:#8ad9b7}.pick b{color:#10261b}
+details{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}summary{cursor:pointer}details label{display:block;margin:10px 0}details label.check{display:flex}
+#retryImages{font-size:12px;margin:0 0 14px}.poster:has(img[data-failed])::after{content:"Ảnh chưa tải";font-size:12px;color:#bed0c3}.poster img[data-failed]{display:none}

@@ -1,0 +1,63 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101814"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'"><title>Stream Pocket</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="dark.css"><link rel="stylesheet" href="local.css"></head><body>
+<header><div class="brand"><img src="icon.svg" width="42" height="42" alt=""><div>Stream Pocket<small>THƯ VIỆN CỦA BẠN</small></div></div><button id="settingsButton" class="icon" aria-label="Cài đặt">⚙</button></header>
+<main>
+<aside id="updateBanner" class="update-banner" hidden><span id="updateBannerText"></span><button id="showUpdate">Xem cập nhật</button></aside>
+<section id="browse" class="screen" hidden>
+<div class="page-heading"><div><p class="eyebrow">KHÁM PHÁ</p><h1>Chọn bộ phim.</h1></div></div>
+<div class="sources"><button id="hgTab" class="active">HuangguoAI</button><button id="ptTab">Porntasia</button></div>
+<div id="hgControls">
+<div class="source-line"><span id="domain">huangguoai.com</span><label class="switch"><input id="fast" type="checkbox"><span>Nguồn nhanh</span></label></div>
+<form id="hgForm" class="search"><input id="hgQuery" aria-label="Tên hoặc link phim" placeholder="Tìm tên hoặc dán link phim…"><button>Mở</button></form>
+<div id="categories" class="chips"><button data-section="home">Trang chủ</button><button data-section="newest">Mới nhất</button><button data-section="drama">Phim ngắn AI</button><button data-section="animation">Truyện tranh AI</button><button data-section="modern">Đô thị</button><button data-section="period">Cổ trang</button></div>
+</div>
+<form id="ptControls" hidden>
+<label>Link danh sách<input id="ptUrl" type="url" placeholder="https://porntasia.app/videos/list/Huangguo%20Short%20Drama?tag_id=1413&page=2"></label>
+<p id="sessionInfo" class="muted">Chế độ khách · không cần nhập token.</p>
+<details id="accountOptions"><summary>Dùng token tài khoản (tùy chọn)</summary>
+<label>Token<input id="ptToken" type="password" autocomplete="off" placeholder="Để trống để dùng chế độ khách"></label>
+<label class="check"><input id="remember" type="checkbox">Nhớ token trên máy này</label>
+<button id="guestMode" type="button">Xóa token, dùng chế độ khách</button></details>
+<div class="search"><input id="ptKeyword" placeholder="Tìm theo từ khóa…" aria-label="Từ khóa"><button>Mở danh sách</button></div>
+</form>
+<div class="list-heading"><h2 id="catalogTitle">Bộ phim</h2><span id="catalogCount"></span></div>
+<button id="translateTitles" class="back">Dịch tên trên Google Dịch ↗</button>
+<button id="retryImages" hidden>Tải lại ảnh</button>
+<p id="imageError" role="status"></p><div id="posters" class="posters"></div><div id="ptRows"></div>
+<button id="more" class="wide" hidden>Xem thêm phim ↓</button>
+<p id="emptyBrowse" class="empty">Chọn nguồn để bắt đầu.</p>
+</section>
+<section id="episodes" class="screen" hidden>
+<button id="backCatalog" class="back">← Chọn bộ khác</button>
+<div class="series-heading"><button id="seriesCover" class="poster series-cover" aria-label="Ảnh bìa bộ phim. Bấm để tải lại nếu ảnh lỗi." hidden></button><div class="series-info"><p class="eyebrow">DANH SÁCH TẬP</p><h1 id="seriesTitle"></h1>
+<p id="episodeCount" class="muted"></p><button id="author" class="author" hidden></button></div></div>
+<form id="seriesForm" class="search"><input id="seriesUrl" aria-label="Link bộ phim"><button>Mở</button><button id="copyLink" type="button" aria-label="Sao chép link">⧉</button></form>
+<button id="sourcePage" class="back">Mở trang gốc ↗</button>
+<label class="check"><input id="seriesFast" type="checkbox">Dùng nguồn nhanh</label>
+<div class="list-heading"><label class="check"><input id="allEpisodes" type="checkbox">Chọn tất cả</label><small>Tick theo thứ tự ghép</small></div>
+<div id="episodeRows"></div>
+</section>
+<section id="local" class="screen">
+<p class="eyebrow">TRÌNH PHÁT</p><h1>Video trên máy.</h1>
+<p class="muted">Quét video trên thiết bị hoặc mở thư mục. Vuốt ngang để tua, vuốt dọc bên trái chỉnh sáng, bên phải chỉnh âm lượng.</p>
+<div class="local-actions"><button id="scanDevice">Quét máy</button><button id="chooseVideoFolder">Chọn thư mục</button><button id="refreshLocal" aria-label="Quét lại video">↻</button></div>
+<button id="grantVideoAccess" class="wide" hidden>Cấp quyền / chọn thêm video</button>
+<p id="localLocation" class="muted"></p>
+<form id="localSearch" class="search"><input id="localQuery" placeholder="Tìm video trong danh sách…" aria-label="Tên video trên máy"><button>Tìm</button></form>
+<div class="list-heading"><span id="localCount"></span><label class="local-sort">Sắp xếp <select id="localSort"><option value="newest">Mới nhất</option><option value="name">Tên / số tập</option></select></label></div>
+<p id="localStatus" role="status" class="muted"></p><div id="localVideos" class="local-videos"></div>
+<button id="moreLocal" class="wide" hidden>Xem thêm video ↓</button>
+</section>
+<section id="queue" class="screen" hidden><div class="page-heading"><div><p class="eyebrow">TRÊN THIẾT BỊ</p><h1>Hàng đợi.</h1></div><button id="clearJobs">Dọn lịch sử</button></div><p class="muted">Tiến trình tiếp tục trong thông báo khi ứng dụng chạy nền.</p><div id="jobs"></div></section>
+<section id="tools" class="screen" hidden><p class="eyebrow">VIDEO TRÊN MÁY</p><h1>Công cụ.</h1><p class="muted">Chọn video từ điện thoại. Thành phẩm lưu vào Downloads / Stream Pocket.</p>
+<button class="tool-card" id="compactTool"><span class="tool-symbol">↘</span><span><strong>Tối ưu video</strong><small>Nén MP4 bằng bộ mã hóa phần cứng</small></span><b>→</b></button>
+<button class="tool-card" id="mergeTool"><span class="tool-symbol">⇥</span><span><strong>Ghép video</strong><small>Nối nhiều tập theo thứ tự đã chọn</small></span><b>→</b></button>
+<p class="tip">Nén H.265 cần thời gian xử lý và có sai khác nhỏ về hình. Máy có thể nóng khi xử lý video dài.</p><div class="list-heading"><h2>Tiến trình xử lý</h2><button id="clearToolJobs">Dọn lịch sử</button></div><div id="toolJobs"></div>
+</section>
+<p id="notice" role="status"></p>
+</main>
+<div id="selectionBar" hidden><span id="selectionCount"></span><button id="downloadSelected" class="primary">Tải đã chọn ↓</button></div>
+<nav class="bottom"><button id="navLocal" class="active"><span>▷</span>Trình phát</button><button id="navTools"><span>⚒</span>Công cụ</button><button id="navBrowse" hidden><span>▤</span>Thư viện nguồn</button><button id="navQueue" hidden><span>↓</span>Hàng đợi</button></nav>
+<dialog id="batchDialog"><form method="dialog"><div class="dialog-head"><h2>Tải video</h2><button value="cancel" aria-label="Đóng">×</button></div><ol id="batchOrder"></ol><label class="check"><input id="compactDownload" type="checkbox">Tối ưu dung lượng bằng phần cứng</label><p class="muted">Ghép sẽ tải đủ các tập, xử lý từng tập rồi lưu một MP4.</p><div class="dialog-actions"><button value="separate">Tải từng file</button><button id="mergeDownload" value="merge" class="primary">Ghép một MP4</button></div></form></dialog>
+<dialog id="fileDialog"><div class="dialog-head"><h2 id="fileTitle"></h2><button id="closeFiles" aria-label="Đóng">×</button></div><p id="fileHelp" class="muted"></p><button id="pickFiles" class="wide">＋ Chọn video</button><ol id="fileList"></ol><label class="check"><input id="deleteOriginals" type="checkbox">Xóa bản gốc sau khi lưu thành công</label><p class="muted">Android có thể yêu cầu xóa bản gốc bằng trình quản lý tệp nếu quyền xóa chưa được cấp.</p><button id="runFiles" class="primary wide">Thực thi</button></dialog>
+<dialog id="settings"><div class="dialog-head"><h2>Ứng dụng</h2><button id="closeSettings" aria-label="Đóng">×</button></div><p id="appVersion">Stream Pocket · Android</p><section id="updatePanel" class="update-panel"><h3>Cập nhật ứng dụng</h3><p id="updateMessage" role="status" class="muted">Tự kiểm tra bản mới từ GitHub mỗi ngày khi mở app.</p><progress id="updateProgress" max="100" value="0" hidden aria-label="Tiến trình tải cập nhật"></progress><div class="update-actions"><button id="checkUpdate">Kiểm tra bản mới</button><button id="downloadUpdate" class="primary" hidden>Tải bản cập nhật</button><button id="installUpdate" class="primary" hidden>Cài đặt</button><button id="cancelUpdate" hidden>Hủy tải</button></div><details id="updateNotesBox" hidden><summary>Thay đổi của bản mới</summary><p id="updateNotes"></p></details><p class="muted">Giữ app mở trong lúc tải APK. Android sẽ yêu cầu xác nhận cài đặt; mật khẩu và dữ liệu app được giữ khi cập nhật.</p></section><p id="encoderInfo" class="muted"></p><label class="check"><input id="enableDownloads" type="checkbox">Bật nguồn video &amp; tải xuống</label><p class="muted">Lần đầu cần đặt mật khẩu; lần sau nhập mật khẩu để mở hai tab. Khởi động lại app hoặc tắt công tắc sẽ khóa lại. Lượt tải đang chạy vẫn tiếp tục. Quên mật khẩu cần gỡ app rồi cài lại; cài đè không reset.</p><p id="featureStatus" role="status" class="muted"></p><button id="showDiagnostics">Chẩn đoán lỗi</button><pre id="diagnosticText" hidden></pre><button id="copyDiagnostics" hidden>Sao chép chẩn đoán</button><p class="muted">Video lưu ở Downloads / Stream Pocket. Tải và xử lý diễn ra trên thiết bị. Cho phép thông báo để theo dõi khi ứng dụng chạy nền.</p><p class="muted">Android có thể dừng tác vụ khi hệ thống thu hồi tiến trình hoặc hết giới hạn chạy nền. Hàng đợi sẽ báo gián đoạn để thử lại.</p><p class="muted">Media3, FFmpegKit, FFmpeg · Apache / LGPL. Xem THIRD_PARTY_NOTICES trong dự án.</p></dialog>
+<script src="app.js"></script></body></html>
