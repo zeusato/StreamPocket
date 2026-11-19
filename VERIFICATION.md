@@ -1,5 +1,15 @@
 # Verification · updated 2026-11-19
 
+## Version 1.1.6
+
+Passed: testReleaseUnitTest (62 offline tests; 66 discovered, 4 opt-in network tests skipped), assembleRelease and lintRelease. APK class presence, 18 native ELF libraries with 16 KB alignment, ZIP alignment and unchanged signing certificate verified. No frontend changes; the existing UI suite was not rerun.
+
+Eight new regression tests cover three overlapping transfers with a bounded three-file window, out-of-order arrivals producing byte-exact playlist order, AES key rotation/explicit and sequence IVs, fail-fast cancellation of earlier stalled workers when a later segment fails, user cancellation with no incoming bytes, malformed TS rejection and partial-output cleanup, fMP4 init/fragment order, rolling-rate decay/unit formatting, and scoped OkHttp cancellation that leaves unrelated player calls intact.
+
+Network requests are registered in a per-download CallGroup, including AES key retrieval. A 500 ms monitor handles cancellation even when the ordered writer is waiting for a request. The owner waits for workers to terminate before removing their temporary files. The assembler remains the single writer; at most three segment files are outstanding, with 64 KiB streaming buffers. No native encoding or media-quality change.
+
+No Android device connected. Tests establish ordering, bounded concurrency and cleanup, not a guaranteed real-world throughput increase. Earlier read-only desktop diagnosis observed varying Huangguo CDN nodes, 1 MiB request samples around 0.34–1.34 MiB/s and two full sequential segments around 1.36–1.89 MiB/s; those measurements are not a benchmark of this parallel implementation. CDN and network conditions can still limit aggregate bandwidth.
+
 ## Version 1.1.5
 
 Passed: testReleaseUnitTest (54 offline tests; 58 discovered, 4 opt-in network tests skipped), assembleRelease and lintRelease. Chrome mocked-bridge UI passed at 360/390/768, including automatic update check, new-version banner, notes, download progress, cancellation, ready-to-install state and installer bridge call. No source live tests rerun for this updater-only change.

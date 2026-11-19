@@ -67,22 +67,30 @@ public final class Hls {
  }
  public static String download(JSONObject source,File file,Stop stop,Progress progress)throws Exception{
   Playlist p=load(source.getString("url"),source,stop);
-  Map<String,byte[]>keys=new HashMap<>();long[] bytes={0},last={System.nanoTime()},previous={0};int[] done={0};
-  Net.Count count=n->{bytes[0]+=n;long now=System.nanoTime();if(now-last[0]>=500_000_000L){progress.update(done[0],p.segments.size(),bytes[0],(bytes[0]-previous[0])*1e9/(now-last[0]));previous[0]=bytes[0];last[0]=now;}};
-  File segmentFile=new File(file.getParentFile(),"segment.part");
-  try(OutputStream out=new BufferedOutputStream(new FileOutputStream(file))){
-   for(Segment s:p.segments){stop.check();Net.transfer(s.url,source,s.start,s.length,segmentFile,stop,count);stop.check();
-    Cipher cipher=null;
-    if(!s.key.isEmpty()){
-     byte[] k=keys.get(s.key);if(k==null){k=Net.bytes(s.key,source,0,0,null);if(k.length!=16)throw new IOException("Khóa AES không hợp lệ.");keys.put(s.key,k);}
-     byte[] iv=new byte[16];byte[] num=(s.iv.isEmpty()?BigInteger.valueOf(s.sequence):new BigInteger(s.iv.replaceFirst("(?i)^0x",""),16)).toByteArray();
-     System.arraycopy(num,Math.max(0,num.length-16),iv,Math.max(0,16-num.length),Math.min(16,num.length));
-     cipher=Cipher.getInstance("AES/CBC/PKCS5Padding");cipher.init(Cipher.DECRYPT_MODE,new SecretKeySpec(k,"AES"),new IvParameterSpec(iv));
-    }
-    try(InputStream raw=new BufferedInputStream(new FileInputStream(segmentFile));InputStream in=cipher==null?raw:new CipherInputStream(raw,cipher)){copySegment(in,out,p.extension.equals("ts"),stop);}
-    segmentFile.delete();done[0]++;progress.update(done[0],p.segments.size(),bytes[0],(bytes[0]-previous[0])*1e9/Math.max(1,System.nanoTime()-last[0]));
+  try(Net.CallGroup calls=new Net.CallGroup()){
+   return assemble(p,file,stop,progress,(index,target,check,count)->{
+    Segment s=p.segments.get(index);Net.transfer(s.url,source,s.start,s.length,target,check,count,calls);
+   },key->Net.bytes(key,source,0,0,null,calls),calls::close);
+  }
+ }
+ interface KeyLoader {byte[] load(String url)throws Exception;}
+ static String assemble(Playlist p,File file,Stop stop,Progress progress,SegmentPipeline.Fetch fetch,KeyLoader keyLoader,Runnable cancel)throws Exception{
+  Map<String,byte[]> keys=new HashMap<>();boolean success=false;
+  try{
+   try(OutputStream out=new BufferedOutputStream(new FileOutputStream(file))){
+    SegmentPipeline.run(p.segments.size(),file,stop,progress,fetch,(index,segmentFile,check)->{
+     Segment s=p.segments.get(index);check.check();Cipher cipher=null;
+     if(!s.key.isEmpty()){
+      byte[] k=keys.get(s.key);if(k==null){k=keyLoader.load(s.key);if(k.length!=16)throw new IOException("Khóa AES không hợp lệ.");keys.put(s.key,k);}
+      byte[] iv=new byte[16];byte[] num=(s.iv.isEmpty()?BigInteger.valueOf(s.sequence):new BigInteger(s.iv.replaceFirst("(?i)^0x",""),16)).toByteArray();
+      System.arraycopy(num,Math.max(0,num.length-16),iv,Math.max(0,16-num.length),Math.min(16,num.length));
+      cipher=Cipher.getInstance("AES/CBC/PKCS5Padding");cipher.init(Cipher.DECRYPT_MODE,new SecretKeySpec(k,"AES"),new IvParameterSpec(iv));
+     }
+     try(InputStream raw=new BufferedInputStream(new FileInputStream(segmentFile));InputStream in=cipher==null?raw:new CipherInputStream(raw,cipher)){copySegment(in,out,p.extension.equals("ts"),check);}
+    },cancel);
    }
-  }finally{segmentFile.delete();}return p.extension;
+   success=true;return p.extension;
+  }finally{if(!success)file.delete();}
  }
  static long copySegment(InputStream in,OutputStream out,boolean ts,Stop stop)throws Exception{
   byte[] buffer=new byte[64*1024];long size=0;int n;

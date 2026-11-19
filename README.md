@@ -4,11 +4,19 @@
 
 ## Cài đặt
 
-Tải **Stream-Pocket-1.1.5.apk** từ [GitHub Releases](https://github.com/zeusato/StreamPocket/releases/latest), mở trên điện thoại và cài đè bản cũ. Cho phép cài ứng dụng từ nguồn đó nếu Android hỏi. Bản release tắt chế độ debug và giữ chứng thư ký của các APK trước để cập nhật không mất dữ liệu; chưa phát hành qua Google Play.
+Tải **Stream-Pocket-1.1.6.apk** từ [GitHub Releases](https://github.com/zeusato/StreamPocket/releases/latest), mở trên điện thoại và cài đè bản cũ. Cho phép cài ứng dụng từ nguồn đó nếu Android hỏi. Bản release tắt chế độ debug và giữ chứng thư ký của các APK trước để cập nhật không mất dữ liệu; chưa phát hành qua Google Play.
 
 Bản 1.1.4 trở về trước cần cài 1.1.5 thủ công một lần. Từ 1.1.5, app tự kiểm tra GitHub khi mở (tối đa một lần mỗi 24 giờ); cũng có nút **Cài đặt → Cập nhật ứng dụng → Kiểm tra**. Có bản mới sẽ hiện thông báo, nút tải và tiến trình. Giữ app mở khi tải APK; tải xong bấm **Cài đặt** và xác nhận trong trình cài Android. App kiểm tra SHA-256, mã phiên bản, package và chữ ký APK trước khi mở trình cài. Có thể hủy tải/thử lại; cài đè giữ thiết lập và mật khẩu.
 
 Cho phép thông báo để theo dõi tải khi app chạy nền. Thành phẩm ở **Download/Stream Pocket**. Xiaomi có thể giới hạn tác vụ chạy nền theo cài đặt pin; nếu hàng đợi bị gián đoạn, mở app để xem trạng thái và thử lại.
+
+## Bản 1.1.6 · Tải HLS song song
+
+- Lấy tối đa 3 đoạn HLS đồng thời, ghi theo đúng thứ tự playlist. Giữ nguyên chất lượng, khóa/IV AES và byte range; hỗ trợ cả TS và init/fragment MP4 như trước.
+- Chỉ giữ một cửa sổ 3 file đoạn tạm trên đĩa; dữ liệu đọc/giải mã qua bộ đệm, không giữ nguyên đoạn trong RAM. Không tải trước cả bộ phim.
+- Khi hủy hoặc một đoạn lỗi, đóng các kết nối thuộc lượt tải đó; đợi worker dừng rồi dọn file tạm và đầu ra chưa hoàn chỉnh. Không hủy kết nối player đang xem.
+- Tốc độ là tổng byte tải qua các luồng, trung bình trượt khoảng 3 giây, cập nhật mỗi 0,5 giây kể cả lúc mạng đứng; hiển thị KiB/s hoặc MiB/s.
+- Giảm thời gian chờ giữa các đoạn; không bảo đảm đạt tốc độ cố định khi CDN/đường truyền bị giới hạn. Chưa đo trên điện thoại thật.
 
 ## Bản 1.1.5 · Cập nhật trong ứng dụng
 

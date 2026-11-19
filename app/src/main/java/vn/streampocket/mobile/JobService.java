@@ -53,7 +53,7 @@ public class JobService extends Service {
      progress(j,i*.5/items.length(),"Đang lấy nguồn "+(i+1)+"/"+items.length());
      JSONObject req=new JSONObject(item.toString());Json.put(req,"token",spec.optString("token"));JSONObject source=Sources.media(req);
      String ext=Hls.download(source,input,()->check(j),(complete,total,bytes,rate)->progress(j,(index+complete/(double)total)*(merge||compact?.5:.9)/items.length(),
-       "Video "+(index+1)+"/"+items.length()+" · "+complete+"/"+total+" đoạn · "+String.format(Locale.US,"%.1f MiB/s",rate/1048576)));
+       "Video "+(index+1)+"/"+items.length()+" · "+complete+"/"+total+" đoạn · "+SegmentPipeline.formatRate(rate)));
      exts.add(ext);
     }
     inputs.add(input);

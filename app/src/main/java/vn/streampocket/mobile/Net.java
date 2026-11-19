@@ -45,6 +45,21 @@ public final class Net {
   }).build();
  }
 
+ public static final class CallGroup implements AutoCloseable {
+  private final Set<Call> active=new HashSet<>();private boolean cancelled;
+  synchronized Ticket attach(Call call)throws IOException{
+   if(cancelled){call.cancel();throw new InterruptedIOException("Đã dừng tải.");}
+   active.add(call);return new Ticket(call,this);
+  }
+  synchronized void remove(Call call){active.remove(call);}
+  public synchronized void close(){cancelled=true;for(Call call:active)call.cancel();}
+ }
+ static final class Ticket implements AutoCloseable {
+  final Call call;final CallGroup owner;
+  Ticket(Call call,CallGroup owner){this.call=call;this.owner=owner;}
+  public void close(){if(owner!=null)owner.remove(call);}
+ }
+ static Ticket ticket(Call call,CallGroup owner)throws IOException{return owner==null?new Ticket(call,null):owner.attach(call);}
  public interface Count {void bytes(int n);}
  public static String origin(String url){URI u=URI.create(url);String authority=u.getAuthority();if("https".equals(u.getScheme())&&u.getPort()==443&&u.getUserInfo()==null)authority=u.getHost();return u.getScheme()+"://"+(authority==null?null:authority.toLowerCase(Locale.ROOT));}
  public static String resolve(String base,String value){return URI.create(base).resolve(value.replace("&amp;","&")).toString();}
@@ -65,12 +80,13 @@ public final class Net {
   }
   return h;
  }
- public static byte[] bytes(String url,JSONObject source,long start,long length,Count count) throws Exception {
+ public static byte[] bytes(String url,JSONObject source,long start,long length,Count count)throws Exception{return bytes(url,source,start,length,count,null);}
+ static byte[] bytes(String url,JSONObject source,long start,long length,Count count,CallGroup calls)throws Exception {
   for(int hop=0;hop<5;hop++){
    allowed(url,source);Request.Builder b=new Request.Builder().url(url).header("User-Agent","Mozilla/5.0 StreamPocket/1.0");
    for(var e:headers(url,source).entrySet())b.header(e.getKey(),e.getValue());
    if(length>0)b.header("Range","bytes="+start+"-"+(start+length-1));
-   try(Response r=forSource(source).newCall(b.build()).execute()){
+   try(Ticket ticket=ticket(forSource(source).newCall(b.build()),calls);Response r=ticket.call.execute()){
     if(Set.of(301,302,303,307,308).contains(r.code())&&r.header("Location")!=null){url=resolve(url,r.header("Location"));continue;}
     if(!r.isSuccessful())throw new IOException("Máy chủ trả HTTP "+r.code());
     if(length>0 && (r.code()!=206 || !r.header("Content-Range","").startsWith("bytes "+start+"-"+(start+length-1)+"/")))throw new IOException("Nguồn trả sai phạm vi dữ liệu.");
@@ -84,12 +100,13 @@ public final class Net {
    }
   }throw new IOException("Nguồn chuyển hướng quá nhiều lần.");
  }
- public static void transfer(String url,JSONObject source,long start,long length,File target,Hls.Stop stop,Count count)throws Exception{
+ public static void transfer(String url,JSONObject source,long start,long length,File target,Hls.Stop stop,Count count)throws Exception{transfer(url,source,start,length,target,stop,count,null);}
+ static void transfer(String url,JSONObject source,long start,long length,File target,Hls.Stop stop,Count count,CallGroup calls)throws Exception{
   for(int hop=0;hop<5;hop++){
    stop.check();allowed(url,source);Request.Builder b=new Request.Builder().url(url).header("User-Agent","Mozilla/5.0 StreamPocket/1.0");
    for(var e:headers(url,source).entrySet())b.header(e.getKey(),e.getValue());
    if(length>0)b.header("Range","bytes="+start+"-"+(start+length-1));
-   try(Response response=forSource(source).newCall(b.build()).execute()){
+   try(Ticket ticket=ticket(forSource(source).newCall(b.build()),calls);Response response=ticket.call.execute()){
     if(Set.of(301,302,303,307,308).contains(response.code())&&response.header("Location")!=null){url=resolve(url,response.header("Location"));continue;}
     if(!response.isSuccessful()||response.body()==null)throw new IOException("Tải đoạn trả HTTP "+response.code());
     if(length>0&&(response.code()!=206||!response.header("Content-Range","").startsWith("bytes "+start+"-"+(start+length-1)+"/")))throw new IOException("Nguồn trả sai phạm vi dữ liệu.");
